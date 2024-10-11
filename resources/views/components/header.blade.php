@@ -9,11 +9,17 @@
 
         <!-- Bouton du menu hamburger pour les petits écrans -->
         <div class="md:hidden">
-            <button id="menu-btn" class="text-gray-900 focus:outline-none">
-                <svg class="h-8 w-8 transition-transform duration-300 ease-in-out" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                </svg>
-            </button>
+        <button 
+            id="menu-btn" 
+            class="text-gray-900 focus:outline-none" 
+            aria-label="Ouvrir le menu" 
+            onclick="toggleMenu()" 
+            onkeypress="if(event.key === 'Enter' || event.key === ' ') toggleMenu();">
+            <svg class="h-8 w-8 transition-transform duration-300 ease-in-out" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+
         </div>
 
         <!-- Menu de navigation -->

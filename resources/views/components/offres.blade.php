@@ -37,10 +37,15 @@
                 </ul>
 
                 <!-- Bouton pour ouvrir le popup -->
-                <button onclick="openPopup({{ json_encode($package) }})"
-                   class="mt-6 inline-block bg-red-500 text-black-900  text-md font-bold px-4 py-2 rounded hover:bg-red-600 transition-colors text-center w-full">
+                <button 
+                    onclick="openPopup({{ json_encode($package) }})" 
+                    class="mt-6 inline-block bg-red-500 text-black-900 text-md font-bold px-4 py-2 rounded hover:bg-red-600 transition-colors text-center w-full" 
+                    aria-label="Ouvrir le popup pour {{ $package['cta'] }}" 
+                    tabindex="0"
+                    onkeypress="if(event.key === 'Enter' || event.key === ' ') openPopup({{ json_encode($package) }});">
                     {{ $package['cta'] }}
                 </button>
+
             </div>
         @endforeach
     </div>
@@ -94,16 +99,31 @@
                     <input type="hidden" id="email" name="email" value="user@example.com">
                     <input type="hidden" id="package_name" name="package_name" value="">
                     <input type="hidden" id="sms_quantity" name="sms_quantity" value="">
-                    <button type="submit" id="pay-button" disabled class="opacity-50 cursor-not-allowed inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors text-center flex items-center space-x-2">
-                        <img src="/images/payment.webp" alt="Paiement" class="w-6 h-6"> <!-- Remplacez l'URL de l'icône par celle souhaitée -->
+                    <button 
+                        type="submit" 
+                        id="pay-button" 
+                        disabled 
+                        class="opacity-50 cursor-not-allowed inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors text-center flex items-center space-x-2" 
+                        aria-label="Paiement désactivé. Vous ne pouvez pas effectuer le paiement." 
+                        aria-disabled="true">
+                        <img src="/images/payment.webp" alt="Icône de paiement" class="w-6 h-6"> <!-- Remplacez l'URL de l'icône par celle souhaitée -->
                         <span>Payer en ligne</span>
                     </button>
+
                 </form>
             </div>
         </div>
 
         <div class="mt-4 flex justify-end">
-            <button onclick="closePopup()" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 transition-colors">Annuler</button>
+        <button 
+            onclick="closePopup()" 
+            class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 transition-colors" 
+            aria-label="Annuler l'action" 
+            onkeypress="if(event.key === 'Enter' || event.key === ' ') closePopup();" 
+            tabindex="0">
+            Annuler
+        </button>
+
         </div>
     </div>
 </div>
