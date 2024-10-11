@@ -25,8 +25,15 @@
             
             <!-- Colonne image à droite -->
             <div class="flex justify-center lg:justify-start">
-                <img src="{{ asset('images/sms.webp') }}" alt="Image d'un téléphone avec SMS reçu" class="w-80 h-auto md:w-96 transform rotate-20 animate-vibration-cycle">
+                <img 
+                    src="{{ asset('images/sms.webp') }}" 
+                    alt="Image d'un téléphone avec SMS reçu" 
+                    width="320" 
+                    height="480" 
+                    loading="lazy" 
+                    class="w-80 h-auto md:w-96 transform rotate-20 animate-vibration-cycle">
             </div>
+
         </div>
     </div>
 </section>
