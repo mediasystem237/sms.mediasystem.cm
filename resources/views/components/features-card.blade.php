@@ -39,7 +39,7 @@
 
                     <!-- Hover effect: Floating icon at the top-right -->
                     <div class="absolute top-0 right-0 p-2">
-                        <div class="bg-brand-blue-600 p-2 rounded-full shadow-lg text-white hover:bg-brand-blue-700 transition-colors">
+                        <div class="bg-brand-red-200 p-2 rounded-full shadow-lg text-white hover:bg-brand-blue-100 transition-colors">
                             {!! $feature['icon'] !!}
                         </div>
                     </div>

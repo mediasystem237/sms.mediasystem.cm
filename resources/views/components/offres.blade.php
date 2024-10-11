@@ -38,7 +38,7 @@
 
                 <!-- Bouton pour ouvrir le popup -->
                 <button onclick="openPopup({{ json_encode($package) }})"
-                   class="mt-6 inline-block bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors text-center w-full">
+                   class="mt-6 inline-block bg-red-500 text-black-900  text-md font-bold px-4 py-2 rounded hover:bg-red-600 transition-colors text-center w-full">
                     {{ $package['cta'] }}
                 </button>
             </div>
