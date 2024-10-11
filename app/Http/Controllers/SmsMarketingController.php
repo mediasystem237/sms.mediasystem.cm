@@ -68,7 +68,7 @@ class SmsMarketingController extends Controller
                     'Accès à toutes les fonctionnalités avancées'
                 ],
                 'link' => 'https://smspro.cm/pack-entreprise',
-                'cta' => 'Contacter un conseiller',
+                'cta' => 'choisir ce pack',
                 'icon' => '🏢',
                 'popular' => false
             ]

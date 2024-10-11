@@ -4,7 +4,7 @@
         <div class="flex flex-col md:flex-row items-center">
             <div class="md:w-1/2 mb-10 md:mb-0 flex justify-center">
                 <!-- Réduire la taille de l'image et ajouter des animations -->
-                <img src="{{ asset('images/md.png') }}" alt="Marketing Digital SMS" class="w-3/4 md:w-2/3 lg:w-1/2  transition-transform duration-300 ease-in-out hover:scale-105">
+                <img src="{{ asset('images/md.webp') }}" alt="Marketing Digital SMS" class="w-3/4 md:w-2/3 lg:w-1/2  transition-transform duration-300 ease-in-out hover:scale-105">
             </div>
             <div class="md:w-1/2 md:pl-12">
                 <h1 class="text-4xl md:text-5xl font-bold text-brand-blue-600 mb-6">Propulsez votre business avec le SMS Marketing</h1>

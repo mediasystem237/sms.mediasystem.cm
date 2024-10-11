@@ -3,7 +3,7 @@
     <div class="container mx-auto px-4 py-4 md:py-6 flex items-center justify-between">
         <!-- Logo et titre -->
         <div class="flex items-center">
-            <img src="{{ asset('images/logo.png') }}" alt="Media System Logo" class="h-10 w-auto md:h-12 mr-3 md:mr-6 transition-transform duration-500 ease-in-out transform hover:scale-110">
+            <img src="{{ asset('images/logo.webp') }}" alt="Media System Logo" class="h-10 w-auto md:h-12 mr-3 md:mr-6 transition-transform duration-500 ease-in-out transform hover:scale-110">
             <h1 class="text-xl md:text-3xl font-extrabold text-brand-blue tracking-wide">Bulk SMS</h1>
         </div>
 

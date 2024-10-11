@@ -88,14 +88,14 @@
             
             <!-- Commande via Paiement en ligne -->
             <div class="flex items-center space-x-2">
-                <form action="#" method="POST" id="payment-form" class="w-full">
+                <form  action="{{ route('pay') }}" method="POST" id="payment-form" class="w-full">
                     @csrf
                     <input type="hidden" id="amount" name="amount" value="0">
                     <input type="hidden" id="email" name="email" value="user@example.com">
                     <input type="hidden" id="package_name" name="package_name" value="">
                     <input type="hidden" id="sms_quantity" name="sms_quantity" value="">
                     <button type="submit" id="pay-button" disabled class="opacity-50 cursor-not-allowed inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors text-center flex items-center space-x-2">
-                        <img src="/images/payment.png" alt="Paiement" class="w-6 h-6"> <!-- Remplacez l'URL de l'icône par celle souhaitée -->
+                        <img src="/images/payment.webp" alt="Paiement" class="w-6 h-6"> <!-- Remplacez l'URL de l'icône par celle souhaitée -->
                         <span>Payer en ligne</span>
                     </button>
                 </form>

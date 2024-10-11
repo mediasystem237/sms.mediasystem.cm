@@ -10,7 +10,7 @@
             <p class="text-gray-600">Orange Cameroun</p>
         </div>
         <div class="bg-white p-6 shadow-md rounded-lg">
-            <img src="/images/camtel-logo.png" alt="Camtel" class="h-12 mx-auto mb-4">
+            <img src="/images/camtel-logo.webp" alt="Camtel" class="h-12 mx-auto mb-4">
             <p class="text-gray-600">Camtel</p>
         </div>
     </div>

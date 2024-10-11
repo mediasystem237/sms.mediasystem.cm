@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+   // config/services.php
+   'notchpay' => [
+    'secret' => env('NOTCHPAY_SECRET_KEY'),
+    'callback' => env('NOTCHPAY_CALLBACK_URL'),
+    ],  
 ];
