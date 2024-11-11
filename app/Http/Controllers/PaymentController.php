@@ -3,150 +3,141 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use PDF;
 use NotchPay\NotchPay;
 use NotchPay\Payment;
 
 class PaymentController extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Initialiser le processus de paiement.
      */
-    public function __invoke(Request $request)
-    {
-        //
-    }
-
     public function initializePayment(Request $request)
-{
-    $amount = $request->amount;
-    $email = $request->email;
-    $currency = 'XAF';
-    $reference = 'TX-' . uniqid();
+    {
+        $amount = $request->sms_quantity * 10;  // Calculer le prix basé sur la quantité
+        $email = 'user@example.com';  // L'email de l'utilisateur
+        $currency = 'XAF';
+        $reference = 'TX-' . uniqid();
 
-    NotchPay::setApiKey(config('services.notchpay.secret'));
+        NotchPay::setApiKey(config('services.notchpay.secret'));
 
-    try {
-        $transaction = Payment::initialize([
-            'amount' => $amount,
-            'email' => $email,
-            'currency' => $currency,
-            'callback' => route('callback'),
-            'reference' => $reference,
-            'metadata' => [
-                'name' => $request->name,
-                'phone' => $request->phone,
-                'city' => $request->city,
-                'package_name' => $request->package_name,
-                'sms_quantity' => $request->sms_quantity,
-                'description' => "Achat de SMS marketing - {$request->package_name}",
-            ],
-            'description' => "Paiement pour {$request->sms_quantity} SMS via le package {$request->package_name}",
-        ]);
+        try {
+            // Initialiser la transaction NotchPay
+            $transaction = Payment::initialize([
+                'amount' => $amount,
+                'email' => $email,
+                'currency' => $currency,
+                'callback' => env('NOTCHPAY_CALLBACK'),  // URL de callback depuis .env
+                'reference' => $reference,
+                'metadata' => [
+                    'name' => $request->name,
+                    'phone' => $request->phone,
+                    'city' => $request->city,
+                    'sms_quantity' => $request->sms_quantity,
+                ],
+                'description' => "Paiement pour l'achat de {$request->sms_quantity} SMS",
+            ]);
 
-        return redirect($transaction->authorization_url);
-    } catch (\NotchPay\Exceptions\ApiException $e) {
-        return back()->with('error', 'Erreur lors de l\'initialisation du paiement : ' . $e->getMessage());
-    }
-}
-
-public function verifyPayment(Request $request)
-{
-    $reference = $request->query('reference');
-    if (!$reference) {
-        return redirect()->route('home')->with('error', 'Référence de transaction manquante');
+            return redirect($transaction->authorization_url);  // Rediriger vers la page de paiement NotchPay
+        } catch (\NotchPay\Exceptions\ApiException $e) {
+            return back()->with('error', 'Erreur lors de l\'initialisation du paiement : ' . $e->getMessage());
+        }
     }
 
-    NotchPay::setApiKey(config('services.notchpay.secret'));
+    /**
+     * Vérifier le paiement après le callback.
+     */
+    public function verifyPayment(Request $request)
+    {
+        $reference = $request->query('reference');
+        if (!$reference) {
+            return redirect()->route('home')->with('error', 'Référence de transaction manquante');
+        }
 
+        NotchPay::setApiKey(config('services.notchpay.secret'));
+
+        try {
+            // Vérifier la transaction via NotchPay
+            $transaction = Payment::verify($reference);
+
+            if (isset($transaction->transaction->status) && $transaction->transaction->status === 'complete') {
+                $metadata = $transaction->transaction->metadata ?? null;
+
+                if (!$metadata) {
+                    return redirect()->route('home')->with('error', 'Les métadonnées de la transaction sont manquantes.');
+                }
+
+                // Rediriger vers la page de confirmation
+                return redirect()->route('confirmation.page', [
+                    'reference' => $transaction->transaction->reference,
+                    'quantity' => $metadata->sms_quantity,
+                    'amount' => $transaction->transaction->amount,
+                    'name' => $metadata->name,
+                ]);
+            } else {
+                return redirect()->route('home')->with('error', 'Le paiement a échoué.');
+            }
+        } catch (\NotchPay\Exceptions\ApiException $e) {
+            return back()->with('error', 'Erreur lors de la vérification du paiement : ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Afficher la page de confirmation après le paiement.
+     */
+    public function showConfirmation(Request $request)
+    {
+        // Récupérer les détails de paiement à partir de la requête
+        $reference = $request->query('reference');
+        $quantity = $request->query('quantity');
+        $amount = $request->query('amount');
+        $name = $request->query('name');
+
+        return view('pages.confirmation', compact('reference', 'quantity', 'amount', 'name'));
+    }
+
+
+    public function paymentFailed()
+    {
+        // Récupérer le message d'erreur
+        $error = session('error', 'Une erreur est survenue lors du paiement. Veuillez réessayer.');
+
+        // Retourner la vue de l'échec avec le message
+        return view('pages.payment_failed', compact('error'));
+    }
+
+    public function generateInvoice($reference)
+{
+    // Récupérer les détails de la transaction avec la référence
+    NotchPay::setApiKey(config('services.notchpay.secret'));
+    
     try {
         $transaction = Payment::verify($reference);
-
-        if (isset($transaction->transaction->status) && $transaction->transaction->status === 'complete') {
-            $metadata = $transaction->transaction->metadata ?? null;
-
-            if (!$metadata) {
-                return redirect()->route('home')->with('error', 'Les métadonnées de la transaction sont manquantes.');
-            }
-
-            return redirect()->route('confirmation.page', [
-                'reference' => $transaction->transaction->reference,
-                'package' => $metadata->package_name,
-                'quantity' => $metadata->sms_quantity,
-                'amount' => $transaction->transaction->amount
-            ])->withoutMiddleware('auth');
-            
-        } else {
-            return redirect()->route('home')->with('error', 'Le paiement a échoué.');
+        
+        if ($transaction->transaction->status !== 'complete') {
+            return redirect()->route('home')->with('error', 'Le paiement n\'a pas été effectué ou a échoué.');
         }
+
+        $metadata = $transaction->transaction->metadata ?? null;
+
+        $invoiceData = [
+            'number' => 'PRO-MS' . date('ym') . '-' . rand(100, 999),
+            'client' => $metadata->name,
+            'total_amount' => $transaction->transaction->amount,
+            'items' => [
+                [
+                    'description' => "Achat de {$metadata->sms_quantity} SMS",
+                    'quantity' => $metadata->sms_quantity,
+                    'unit_price' => $transaction->transaction->amount / $metadata->sms_quantity,
+                    'total_price' => $transaction->transaction->amount,
+                ]
+            ]
+        ];
+
+        $pdf = PDF::loadView('invoices.invoice', $invoiceData);
+        return $pdf->download('facture_' . $invoiceData['number'] . '.pdf');
     } catch (\NotchPay\Exceptions\ApiException $e) {
-        return back()->with('error', 'Erreur lors de la vérification du paiement : ' . $e->getMessage());
+        return back()->with('error', 'Erreur lors de la génération de la facture : ' . $e->getMessage());
     }
 }
-
-public function generateInvoice($transaction)
-{
-    $invoiceData = [
-        'number' => 'PRO-MS' . date('ym') . '-' . rand(100, 999),
-        'date' => date('d-m-Y'),
-        'client' => $transaction['name'],
-        'phone' => $transaction['phone'],
-        'city' => $transaction['city'],
-        'total_amount' => $transaction['amount'],
-        'items' => [
-            [
-                'description' => $transaction['package'],
-                'details' => ["Achat de {$transaction['quantity']} SMS marketing"],
-                'quantity' => $transaction['quantity'],
-                'unit_price' => $transaction['amount'] / $transaction['quantity'],
-                'total_price' => $transaction['amount'],
-            ]
-        ]
-    ];
-
-    $pdf = PDF::loadView('invoices.a6_invoice', $invoiceData)->setPaper('a6');
-    return $pdf->download('facture_' . $invoiceData['number'] . '.pdf');
-}
-
-
-public function showConfirmation(Request $request)
-{
-    // Extract payment details from the request
-    $reference = $request->query('reference');
-    $package = $request->query('package');
-    $quantity = $request->query('quantity');
-    $amount = $request->query('amount');
-    
-    // Pass the payment details to the view
-    return view('pages.confirmation', compact('reference', 'package', 'quantity', 'amount'));
-}
-
-
-public function downloadInvoice($transaction)
-{
-    $invoiceData = [
-        'number' => 'PRO-MS' . date('ym') . '-' . rand(100, 999),
-        'date' => date('d-m-Y'),
-        'client' => $transaction->transaction->metadata->name,
-        'phone' => $transaction->transaction->metadata->phone,
-        'city' => $transaction->transaction->metadata->city,
-        'total_amount' => $transaction->transaction->amount,
-        'items' => [
-            [
-                'description' => $transaction->transaction->metadata->package_name,
-                'details' => ["Achat de {$transaction->transaction->metadata->sms_quantity} SMS marketing"],
-                'quantity' => $transaction->transaction->metadata->sms_quantity,
-                'unit_price' => $transaction->transaction->amount / $transaction->transaction->metadata->sms_quantity,
-                'total_price' => $transaction->transaction->amount,
-            ]
-        ]
-    ];
-
-    $pdf = PDF::loadView('invoices.a6_invoice', $invoiceData)->setPaper('a6');
-
-    return $pdf->download('facture_' . $invoiceData['number'] . '.pdf');
-}
-
-
 
 }

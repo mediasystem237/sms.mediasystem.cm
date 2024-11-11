@@ -93,7 +93,7 @@
             
             <!-- Commande via Paiement en ligne -->
             <div class="flex items-center space-x-2">
-                <form  action="{{ route('pay') }}" method="POST" id="payment-form" class="w-full">
+                <form  action="{{ route('pay') }}" method="POST" id="payment-form" class="w-full" target="_blank">
                     @csrf
                     <input type="hidden" id="amount" name="amount" value="0">
                     <input type="hidden" id="email" name="email" value="user@example.com">

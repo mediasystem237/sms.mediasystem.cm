@@ -9,7 +9,10 @@ use App\Http\Controllers\PaymentController;
 Route::post('/pay', [PaymentController::class, 'initializePayment'])->name('pay');
 Route::get('/callback', [PaymentController::class, 'verifyPayment'])->name('callback');
 Route::get('/confirmation', [PaymentController::class, 'showConfirmation'])->name('confirmation.page');
-Route::get('/download-invoice/{transaction}', [PaymentController::class, 'downloadInvoice'])->name('download.invoice');
+Route::get('/download-invoice/{reference}', [PaymentController::class, 'downloadInvoice'])->name('download.invoice');
+Route::get('/payment/failed', [PaymentController::class, 'paymentFailed'])->name('payment.failed');
+
+
 
 
 
