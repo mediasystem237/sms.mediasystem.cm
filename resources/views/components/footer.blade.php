@@ -16,7 +16,7 @@
                     <li><a href="#promotions" class="text-gray-600 hover:text-brand-red transition-colors text-sm md:text-base">Promotions</a></li>
                     <li><a href="#comment-ca-marche" class="text-gray-600 hover:text-brand-red transition-colors text-sm md:text-base">Comment ça marche</a></li>
                     <li>
-                        <a href="{{ asset('downloads/template-smspro.xlsx') }}" class="text-gray-600 hover:text-brand-red transition-colors text-sm md:text-base" download>
+                        <a href="{{ asset('downloads/modele.xlsx') }}" class="text-gray-600 hover:text-brand-red transition-colors text-sm md:text-base" download>
                             Télécharger le modèle Excel
                         </a>
                     </li>
