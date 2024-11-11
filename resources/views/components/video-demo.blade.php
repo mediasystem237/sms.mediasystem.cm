@@ -3,15 +3,35 @@
         <!-- Grille responsive -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <!-- Colonne Vidéo -->
-            <div class="relative w-full" style="padding-top: 56.25%;">
-                <iframe 
-                    src="https://www.youtube.com/embed/VIDEO_ID" 
-                    frameborder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen
-                    class="absolute top-0 left-0 w-full h-full rounded-lg shadow-lg">
-                </iframe>
-            </div>
+            <div class="video-container relative w-full mx-auto" style="max-width: 800px; padding-top: 56.25%;">
+            <iframe 
+                src="https://www.youtube.com/embed/0OUsBQuLDrs" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen
+                class="video-frame absolute top-0 left-0 w-full h-full rounded-lg shadow-lg border-4 border-brand-blue">
+            </iframe>
+        </div>
+
+        <style>
+            .video-container {
+                border-radius: 15px;
+                overflow: hidden; /* Empêche le débordement des coins arrondis */
+            }
+
+            .video-frame {
+                border: 4px solid #007BFF; /* Couleur personnalisée */
+                box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2); /* Ombre subtile */
+                border-radius: 15px; /* Coins arrondis */
+                transition: transform 0.3s ease; /* Effet de zoom */
+            }
+
+            /* Effet de zoom sur survol */
+            .video-frame:hover {
+                transform: scale(1.02);
+            }
+        </style>
+
             
             <!-- Colonne Texte Explicatif -->
             <div class="flex flex-col justify-center text-center lg:text-left">
