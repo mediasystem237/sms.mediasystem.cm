@@ -128,6 +128,9 @@
     </div>
 </div>
 
+<script>
+    const packages = @json($packages);
+</script>
 
 <script>
     let currentPackage = null;
@@ -144,22 +147,29 @@
     }
 
     function calculatePrice() {
-        const quantity = parseInt(document.getElementById('sms-quantity').value);
-        if (isNaN(quantity) || quantity < 1000) {
-            document.getElementById('sms-price').innerText = "Veuillez entrer une quantité valide d'au moins 1000 SMS.";
-            return;
-        }
+    const quantity = parseInt(document.getElementById('sms-quantity').value);
+    if (isNaN(quantity) || quantity < 1000) {
+        document.getElementById('sms-price').innerText = "Veuillez entrer une quantité valide d'au moins 1000 SMS.";
+        return;
+    }
 
-        let pricePerSms;
-        if (quantity >= 1000 && quantity <= 4999) {
-            pricePerSms = 15;
-        } else if (quantity >= 5000 && quantity <= 9999) {
-            pricePerSms = 13;
-        } else if (quantity >= 10000) {
-            pricePerSms = 11.5;
-        }
+    let pricePerSms = null;
 
-        const totalPrice = quantity * pricePerSms;
+    // Rechercher le package correspondant à la quantité
+    for (const pack of packages) {
+        const [min, max] = pack.sms_range;
+        if (quantity >= min && (max === null || quantity <= max)) {
+            pricePerSms = pack.price;
+            break;
+        }
+    }
+
+    if (pricePerSms === null) {
+        document.getElementById('sms-price').innerText = "Aucun package ne correspond à cette quantité.";
+        return;
+    }
+
+    const totalPrice = quantity * pricePerSms;
 
         // Mettre à jour le prix total
         document.getElementById('sms-price').innerHTML = `Le prix total pour <strong>${quantity}</strong> SMS est : <strong>${totalPrice.toLocaleString()} FCFA</strong>`;
