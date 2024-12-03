@@ -40,7 +40,7 @@ class SmsMarketingController extends Controller
             ],
             [
                 'name' => 'Pack Pro',
-                'price' => 13, 
+                'price' => 13.5, 
                 'sms_quantity' => '5 000 à 9 999 SMS',
                 'sms_range' => [5000, 9999],
                 'total_price' => 'À partir de 65 000 FCFA',
@@ -57,7 +57,7 @@ class SmsMarketingController extends Controller
             ],
             [
                 'name' => 'Pack Entreprise',
-                'price' => 11.5, 
+                'price' => 12, 
                 'sms_quantity' => '10 000 SMS et plus',
                 'sms_range' => [10000, null],
                 'total_price' => 'À partir de 115 000 FCFA',
