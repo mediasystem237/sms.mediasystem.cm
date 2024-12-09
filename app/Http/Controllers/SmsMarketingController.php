@@ -8,22 +8,23 @@ class SmsMarketingController extends Controller
 {
     public function index()
     {
-        // Liste des villes
-        $villes = [
-            'Yaoundé', 'Douala', 'Garoua', 'Bamenda', 'Maroua', 'Nkongsamba', 'Bafoussam', 
-            'Ngaoundéré', 'Bertoua', 'Loum', 'Kumba', 'Edéa', 'Kumbo', 'Foumban', 
-            'Mbouda', 'Dschang', 'Limbé', 'Ebolowa', 'Kousséri', 'Guider', 'Meiganga', 
-            'Yagoua', 'Mbalmayo', 'Bafang', 'Tiko', 'Bafia', 'Wum', 'Kribi', 'Buea', 
-            'Sangmélima', 'Foumbot', 'Bangangté', 'Batouri', 'Banyo', 'Nkambé', 'Bali', 
-            'Mbanga', 'Mokolo', 'Melong', 'Manjo', 'Garoua-Boulaï', 'Mora', 'Kaélé', 
-            'Tibati', 'Ndop', 'Akonolinga', 'Eséka', 'Mamfé', 'Obala', 'Muyuka'
-        ];
+        // Appel des méthodes statiques pour récupérer les données
+        $villes = $this->getVilles();
+        $packages = $this->getPackages();
+        $features = $this->getFeatures();
 
-        // Définir les packages
-        $packages = [
+        return view('pages.home', compact('villes', 'packages', 'features'));
+    }
+
+    /**
+     * Méthode statique pour retourner les packages.
+     */
+    public static function getPackages()
+    {
+        return [
             [
                 'name' => 'Pack Débutant',
-                'price' => 15, 
+                'price' => 15,
                 'sms_quantity' => '1 000 à 4 999 SMS',
                 'sms_range' => [1000, 4999],
                 'total_price' => 'À partir de 15 000 FCFA',
@@ -40,7 +41,7 @@ class SmsMarketingController extends Controller
             ],
             [
                 'name' => 'Pack Pro',
-                'price' => 13.5, 
+                'price' => 13.5,
                 'sms_quantity' => '5 000 à 9 999 SMS',
                 'sms_range' => [5000, 9999],
                 'total_price' => 'À partir de 65 000 FCFA',
@@ -57,7 +58,7 @@ class SmsMarketingController extends Controller
             ],
             [
                 'name' => 'Pack Entreprise',
-                'price' => 12, 
+                'price' => 12,
                 'sms_quantity' => '10 000 SMS et plus',
                 'sms_range' => [10000, null],
                 'total_price' => 'À partir de 115 000 FCFA',
@@ -68,14 +69,50 @@ class SmsMarketingController extends Controller
                     'Accès à toutes les fonctionnalités avancées'
                 ],
                 'link' => 'https://smspro.cm/pack-entreprise',
-                'cta' => 'choisir ce pack',
+                'cta' => 'Choisir ce pack',
                 'icon' => '🏢',
                 'popular' => false
             ]
         ];
+    }
 
-        // Définir les secteurs d'activité avec les cas d'utilisation
-        $features = [
+    /**
+     * Méthode statique pour retourner les villes.
+     */
+    public static function getVilles()
+    {
+        return [
+            'Yaoundé', 'Douala', 'Garoua', 'Bamenda', 'Maroua', 'Nkongsamba', 'Bafoussam',
+            'Ngaoundéré', 'Bertoua', 'Loum', 'Kumba', 'Edéa', 'Kumbo', 'Foumban',
+            'Mbouda', 'Dschang', 'Limbé', 'Ebolowa', 'Kousséri', 'Guider', 'Meiganga',
+            'Yagoua', 'Mbalmayo', 'Bafang', 'Tiko', 'Bafia', 'Wum', 'Kribi', 'Buea',
+            'Sangmélima', 'Foumbot', 'Bangangté', 'Batouri', 'Banyo', 'Nkambé', 'Bali',
+            'Mbanga', 'Mokolo', 'Melong', 'Manjo', 'Garoua-Boulaï', 'Mora', 'Kaélé',
+            'Tibati', 'Ndop', 'Akonolinga', 'Eséka', 'Mamfé', 'Obala', 'Muyuka'
+        ];
+    }
+
+    public static function findPriceForQuantity($sms_quantity)
+    {
+        $packages = self::getPackages();
+        
+        foreach ($packages as $package) {
+            if ($sms_quantity >= $package['sms_range'][0] && 
+               ($package['sms_range'][1] === null || $sms_quantity <= $package['sms_range'][1])) {
+                return $package['price'];
+            }
+        }
+
+        return 15; // Valeur par défaut si aucune correspondance trouvée
+    }
+
+
+         /**
+     * Méthode statique pour retourner les fonctionnalités.
+     */
+    public static function getFeatures()
+    {
+        return [
             [
                 'icon' => '<svg class="text-brand-blue-600" width="32" height="32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
                 'title' => "Secteur de la Vente au Détail",
@@ -104,11 +141,8 @@ class SmsMarketingController extends Controller
                     "Envoyer des rappels d'événements scolaires ou des dates importantes.",
                     "Notifier les parents et les élèves en cas d'urgence ou de fermeture d'établissement.",
                     "Communiquer les résultats académiques et les mises à jour importantes."
-                ]
-            ]
-        ];
-
-        // Envoyer les packages, villes et fonctionnalités à la vue 'pages.home'
-        return view('pages.home', compact('villes', 'packages', 'features'));
-    }
-}
+                    ]
+                    ]
+                ];
+            }
+        }

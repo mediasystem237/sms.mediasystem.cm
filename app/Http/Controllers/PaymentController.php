@@ -12,87 +12,38 @@ class PaymentController extends Controller
      * Initialiser le processus de paiement.
      */
     public function initializePayment(Request $request)
-    {
-        // Valider les données entrantes
-        $request->validate([
-            'sms_quantity' => 'required|integer|min:1000',
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
-            'city' => 'required|string|max:255',
-        ]);
-    
-        $smsQuantity = $request->sms_quantity;
-    
-        // Définir les packages (les mêmes que dans SmsMarketingController)
-        $packages = [
-            [
-                'name' => 'Pack Débutant',
-                'price' => 15,
-                'sms_range' => [1000, 4999],
-            ],
-            [
-                'name' => 'Pack Pro',
-                'price' => 13.5,
-                'sms_range' => [5000, 9999],
-            ],
-            [
-                'name' => 'Pack Entreprise',
-                'price' => 12,
-                'sms_range' => [10000, null],
-            ]
-        ];
-    
-        // Rechercher le package correspondant
-        $pricePerSms = null;
-        foreach ($packages as $package) {
-            [$min, $max] = $package['sms_range'];
-            if ($smsQuantity >= $min && ($max === null || $smsQuantity <= $max)) {
-                $pricePerSms = $package['price'];
-                break;
-            }
-        }
-    
-        // Vérifier si aucun package ne correspond
-        if ($pricePerSms === null) {
-            return back()->with('error', 'Aucun package ne correspond à cette quantité.');
-        }
-    
-        // Calculer le montant total
-        $amount = $smsQuantity * $pricePerSms;
-    
-        // Informations pour la transaction
-        $email = 'user@example.com';  // L'email de l'utilisateur (à remplacer dynamiquement si nécessaire)
+{
+    NotchPay::setApiKey(config('services.notchpay.secret'));
+
+    try {
+        // Obtenir le prix via SmsMarketingController
+        $pricePerSms = SmsMarketingController::findPriceForQuantity($request->sms_quantity);
+        $amount = $request->sms_quantity * $pricePerSms; // Calculer le montant total
+        $email = 'user@example.com';
         $currency = 'XAF';
         $reference = 'TX-' . uniqid();
-    
-        NotchPay::setApiKey(config('services.notchpay.secret'));
-    
-        try {
-            // Initialiser la transaction NotchPay
-            $transaction = Payment::initialize([
-                'amount' => $amount,
-                'email' => $email,
-                'currency' => $currency,
-                'callback' => env('NOTCHPAY_CALLBACK'),  // URL de callback depuis .env
-                'reference' => $reference,
-                'metadata' => [
-                    'name' => $request->name,
-                    'phone' => $request->phone,
-                    'city' => $request->city,
-                    'sms_quantity' => $smsQuantity,
-                ],
-                'description' => "Paiement pour l'achat de {$smsQuantity} SMS",
-            ]);
-    
-            // Rediriger vers la page de paiement
-            return redirect($transaction->authorization_url);
-    
-        } catch (\NotchPay\Exceptions\ApiException $e) {
-            // Gérer les erreurs de paiement
-            return back()->with('error', 'Erreur lors de l\'initialisation du paiement : ' . $e->getMessage());
-        }
+
+        $transaction = Payment::initialize([
+            'amount' => $amount,
+            'email' => $email,
+            'currency' => $currency,
+            'callback' => env('NOTCHPAY_CALLBACK'),
+            'reference' => $reference,
+            'metadata' => [
+                'name' => $request->name,
+                'phone' => $request->phone,
+                'city' => $request->city,
+                'sms_quantity' => $request->sms_quantity,
+            ],
+            'description' => "Paiement pour l'achat de {$request->sms_quantity} SMS",
+        ]);
+
+        return redirect($transaction->authorization_url);
+    } catch (\NotchPay\Exceptions\ApiException $e) {
+        return back()->with('error', 'Erreur lors de l\'initialisation du paiement : ' . $e->getMessage());
     }
-    
+}
+
 
     /**
      * Vérifier le paiement après le callback.
